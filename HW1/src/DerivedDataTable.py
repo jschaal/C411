@@ -1,6 +1,7 @@
-#02/08/19 11:30 PM
+# 02/10/19 09:20 AM
 
 from BaseDataTable import BaseDataTable
+
 
 class DerivedDataTable(BaseDataTable):
     """
@@ -8,7 +9,7 @@ class DerivedDataTable(BaseDataTable):
     base class and implement the abstract methods.
     """
 
-    def __init__(self,  table_name, rows, connect_info, key_columns=None, debug=True):
+    def __init__(self, table_name, rows, connect_info, key_columns=None, debug=True):
         """
 
         :param table_name: Name of the table. This is the table name for an RDB table or the file name for
@@ -42,8 +43,8 @@ class DerivedDataTable(BaseDataTable):
     def __len__(self):
         return len(self._rows)
 
-#    def all_rows(self):
-#        return self._rows;
+    #    def all_rows(self):
+    #        return self._rows;
 
     def find_by_primary_key(self, key_fields, field_list=None):
         """

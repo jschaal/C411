@@ -1,4 +1,4 @@
-# 02/08/19 11:30 PM
+# 02/10/19 09:20 AM
 
 from CSVDataTable import CSVDataTable
 
@@ -12,7 +12,7 @@ def test0():
     t1 = CSVDataTable("People",
                       connect_info={
                           #                          "directory": "/Users/Sophie/Documents/Databases/HW1/Data",
-                          "directory": "/home/joe/Python/Sophie/HW1Dad/HW1/Data",
+                          "directory": "/home/joe/PycharmProjects/C411/HW1/Data",
                           "file_name": "People.csv"
                       }, key_columns=['playerID'], debug=True)
 
@@ -144,7 +144,7 @@ def test1():
     t1 = CSVDataTable("BattingSmall",
                       connect_info={
                           #                          "directory": "/Users/Sophie/Documents/Databases/HW1/Data",
-                          "directory": "/home/joe/Python/Sophie/HW1Dad/HW1/Data",
+                          "directory": "/home/joe/PycharmProjects/C411/HW1/Data",
                           "file_name": "BattingSmall.csv"
                       }, key_columns=['playerID', 'yearID', 'stint'], debug=True)
 
@@ -278,7 +278,7 @@ def test2():
     t1 = CSVDataTable("People",
                       connect_info={
                           #                          "directory": "/Users/Sophie/Documents/Databases/HW1/Data",
-                          "directory": "/home/joe/Python/Sophie/HW1Dad/HW1/Data",
+                          "directory": "/home/joe/PycharmProjects/C411/HW1/Data",
                           "file_name": "PeopleSmall.csv"
                       }, key_columns=['playerID'], debug=True)
 

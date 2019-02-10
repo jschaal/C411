@@ -1,8 +1,7 @@
-from BaseDataTable import BaseDataTable
-from DerivedDataTable import DerivedDataTable
 import pandas as pd
-
 import pymysql
+
+from BaseDataTable import BaseDataTable
 
 
 class RDBDataTable(BaseDataTable):
@@ -112,7 +111,7 @@ class RDBDataTable(BaseDataTable):
         else:
             r = None
 
-        if commit:                  # Do not worry about this for now.
+        if commit:  # Do not worry about this for now.
             cnx.commit()
 
         return r
@@ -212,7 +211,7 @@ class RDBDataTable(BaseDataTable):
             self._run_insert(self._table_name, c_list, v_list)
         except Exception as e:
             print("insert: Exception e = ", e)
-            raise(e)
+            raise (e)
 
     def delete_by_key(self, key_fields):
         """
@@ -253,6 +252,3 @@ class RDBDataTable(BaseDataTable):
         :return: The number of rows updates.
         """
         pass
-            
-
-
