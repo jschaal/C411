@@ -1,11 +1,8 @@
-from BaseDataTable import BaseDataTable
-from DerivedDataTable import DerivedDataTable
 import pandas as pd
-
 import pymysql
 
+from BaseDataTable import BaseDataTable
 
-#uses SQL keys
 
 class RDBDataTable(BaseDataTable):
     """
@@ -16,8 +13,8 @@ class RDBDataTable(BaseDataTable):
     # specific connection on object creation.
     _default_connect_info = {
         'host': 'localhost',
-        'user': 'joe',
-        'password': 'deb4joe',
+        'user': 'dbuser',
+        'password': 'dbuser',
         'db': 'lahman2017',
         'port': 3306
     }
@@ -55,7 +52,6 @@ class RDBDataTable(BaseDataTable):
             db=self._connect_info['db'],
             charset='utf8mb4',
             cursorclass=pymysql.cursors.DictCursor)
-
 
     def __str__(self):
         """
@@ -97,8 +93,6 @@ class RDBDataTable(BaseDataTable):
         if cnx is None:
             cnx = self._cnx
 
-        cursor = cnx.cursor()
-
         # Convert the list of columns into the form "col1, col2, ..." for following SELECT.
         if fields:
             q = q.format(",".join(fields))
@@ -115,9 +109,9 @@ class RDBDataTable(BaseDataTable):
         if fetch:
             r = cursor.fetchall()  # Return all elements of the result.
         else:
-            r = cnt
+            r = None
 
-        if commit:                  # Do not worry about this for now.
+        if commit:  # Do not worry about this for now.
             cnx.commit()
 
         return r
@@ -156,15 +150,6 @@ class RDBDataTable(BaseDataTable):
             print("Got exception = ", e)
             raise e
 
-    def _get_primary_key(self):
-
-        q = "SHOW KEYS FROM " + self._table_name +  " WHERE Key_name = 'Primary'"
-        keys = self._run_q(q=q, args=None)
-
-        keys = [r["Column_name"] for r in rows]
-
-        return keys
-
     def find_by_primary_key(self, key_fields, field_list=None):
         """
 
@@ -173,15 +158,7 @@ class RDBDataTable(BaseDataTable):
         :return: None, or a dictionary containing the request fields for the record identified
             by the key.
         """
-        key_columns = self._get_primary_key()
-        tmp = dict(zip(key_columns, key_fields))
-        result = self.find_by_template(tmp, field_list=field_list)
-
-        if result is not None:
-            result= result._rows[0]
-
-        return result
-
+        pass
 
     def _template_to_where_clause(self, t):
         """
@@ -220,30 +197,7 @@ class RDBDataTable(BaseDataTable):
         :return: A list containing dictionaries. A dictionary is in the list representing each record
             that matches the template. The dictionary only contains the requested fields.
         """
-        try:
-            wc = self._template_to_where_clause(template)
-
-            if field_list:
-                q = "select {} from " + self._table_name + " " + wc[0]
-
-            else:
-                q = "select * from " + self._table_name + " " + wc[0]
-
-            result= self._run_q(q, args=wc[1], fields=field_list, commit = True, fetch=True)
-            return result
-
-            if result and len(result) > 0:
-                final_result = DerivedDataTable("FBT:" + self._table_name, result)
-
-            else:
-                final_result = None
-
-            return final_result
-
-        except Exception as e:
-            print("RDBDataTable.find_by_template: Exception = ", e)
-            raise e
-
+        pass
 
     def insert(self, new_record):
         """
@@ -257,7 +211,7 @@ class RDBDataTable(BaseDataTable):
             self._run_insert(self._table_name, c_list, v_list)
         except Exception as e:
             print("insert: Exception e = ", e)
-            raise(e)
+            raise (e)
 
     def delete_by_key(self, key_fields):
         """
@@ -267,12 +221,7 @@ class RDBDataTable(BaseDataTable):
         :param key_fields: Primary key fields.
         :return: A count of the rows deleted.
         """
-
-        wc = self._template_to_where_clause(template)
-        q = "delete from " + self._table_name + " " + wc[0]
-
-        result = self = _run_q(q, args=wc[1], fetch=False)
-        return result
+        pass
 
     def delete_by_template(self, key_fields):
         """
@@ -282,10 +231,9 @@ class RDBDataTable(BaseDataTable):
         :param template: A template.
         :return: A count of the rows deleted.
         """
-        template = self.makeTemplateFromKeys(key_fields)
-        return self.update_by_template(template, new_values)
+        pass
 
-    def update_by_key(self, key_fields, new_values):
+    def update_by_key(self, template, key_fields):
         """
 
         :param key_fields: Primary key fields.
@@ -293,13 +241,7 @@ class RDBDataTable(BaseDataTable):
             in the records.
         :return: The number of rows updates.
         """
-        #template = self.makeTemplateFromKeys(key_fields)
-        #return self.update_by_template(template, new_values)
-        #template = self.makeTemplateFromKeys(key_fields)
-
-        template = self.makeTemplateFromKeys(key_fields)
-        return self.update_by_template(template, new_values)
-
+        pass
 
     def update_by_template(self, template, new_values):
         """
@@ -309,53 +251,4 @@ class RDBDataTable(BaseDataTable):
             in the records.
         :return: The number of rows updates.
         """
-        terms = []
-        set_args = []
-
-        for k, v in new_values.items():
-            terms.append(k + "=%s")
-            set_args.append(v)
-
-        terms = ",".join(terms)
-
-        wc = self._template_to_where_clause(template)
-
-        set_args.extend(wc[1])
-
-        q = "update " + self._table_name + " set " + terms + " " + wc[0]
-
-        result = self._run_q(q, set_args, fetch=False)
-        return result
-
-    #  Helper function to make a template from key fields
-    def makeTemplateFromKeys(self, key_fields):
-        """
-        :param key_fields: The values for the key_columns, in order, to use to find a record. For example,
-            for Appearances this could be ['willite01', 'BOS', '1960']
-        """
-
-        template = {}
-        for keyNum in range(0, len(self._key_columns)):
-            template[self._key_columns[keyNum]] = key_fields[keyNum]
-
-        return template
-
-    def matches_template(self, row, template):
-
-        keys = list(template.keys())
-
-        for k in keys:
-
-            # doesn't match the template
-            v = row.get(k, None)
-            if template[k] != v:
-                return False
-
-        return True
-
-
-#in SQL
-#SHOW KEYS FROM People WHERE Key_name = 'PRIMARY'
-
-
-#SHOW KEYS FROM Batting WHERE Key_name = 'PRIMARY'
+        pass

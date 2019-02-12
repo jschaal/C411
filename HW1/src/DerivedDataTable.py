@@ -43,8 +43,6 @@ class DerivedDataTable(BaseDataTable):
     def __len__(self):
         return len(self._rows)
 
-    #    def all_rows(self):
-    #        return self._rows;
 
     def find_by_primary_key(self, key_fields, field_list=None):
         """
